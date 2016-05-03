@@ -1,0 +1,97 @@
+{% load humanize %}
+{% load i18n %}
+{% load express %}
+
+<div class='b-wrapper'>
+<div class='b-tariffs'>
+
+	<div class='b-tariff_keys'>
+		<ul class='b-properties'>
+			{% for property in properties %}
+				<li class="b-property">{{ property }}</li>
+			{% endfor %}
+		</ul><!-- b-properties -->
+		<ul class='b-options'>
+			{% for option in options %}
+				<li class='b-option'>{{ option }}</li>
+			{% endfor %}
+		</ul><!-- b-options -->
+		<b class='b-tariffs__price'>{% trans "Price" %}</b>
+	</div><!-- b-tariff_keys -->
+
+	{% for tariff in tariffs %}
+		<div class='b-tariff m-tariff_{{ tariff.id }} m-vip_{{ tariff.vip }}'>
+			<h3 class='b-tariff__title'>{{ tariff.title }}</h3>
+
+			{% if tariff.sub_title %}
+				<big class='b-tariff__sub_title'>{{ tariff.sub_title }}</big>
+			{% endif %}
+
+			{% if tariff.image %}
+				<img src='{{ tariff.image.url }}' alt='{{ tariff.title }}' class='b-tariff__image'>
+			{% endif %}
+
+			{% if tariff.description %}
+				<div class='b-tariff__description'>{{ tariff.description|safe }}</div>
+			{% endif %}
+
+			<ul class='b-tariff_properties'>
+				{% for property in properties %}
+					{% if property in tariff.property_list %}
+						<li class='b-tariff_property__value'>{{ tariff|get_property_value:property }}</li>
+					{% else %}
+						<li class='b-tariff_property__empty_value'></li>
+					{% endif %}
+				{% endfor %}
+
+				{% for option in options %}
+					{% if option in tariff.options_list %}
+						<li class='b-tariff_option__yes'>{{ option }}</li>
+					{% else %}
+						<li class='b-tariff_option__no'>{{ option }}</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+			{% comment %}
+			additions
+				name
+				description
+				price
+				price_from
+				price_after
+				selected
+				order
+			{% endcomment %}
+
+			{% if tariff.old_price %}
+				<del class='b-tariff__old_price'>
+					{% if tariff.price_from %}
+						<span class='b-price_from'>{% trans "from" %}</span>
+					{% endif %}
+					<span class='b-tariff__old_price_value m-valute_{{ site.config.get.valute }}'>
+						{{ tariff.old_price }}
+					</span>
+					{% if tariff.price_after %}
+						<span class='b-tariff__after'>{{ tariff.price_after }}</span>
+					{% endif %}
+				</del><!-- b-tariff__old_price -->
+			{% endif %}
+
+			<span class='b-tariff__new_price'>
+				{% if tariff.price_from %}
+					<span class='b-price_from'>{% trans "from" %}</span>
+				{% endif %}
+				<span class='b-tariff__price_value m-valute_{{ site.config.get.valute }}'>
+					{{ tariff.new_price }}
+				</span>
+				{% if tariff.price_after %}
+					<span class='b-tariff__after'>{{ tariff.price_after }}</span>
+				{% endif %}
+			</span><!-- b-tariff__new_price -->
+
+			<a href='{{ tariff.get_absolute_url }}' class='b-tariff__submit'>{% trans "Order" %}</a>
+		</div><!-- b-tariff -->
+	{% endfor %}
+
+</div><!-- b-tariffs -->
+</div><!-- b-wrapper -->

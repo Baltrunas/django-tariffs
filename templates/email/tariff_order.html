@@ -1,0 +1,56 @@
+{% extends "email/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<table cellspacing="0" style='width: 100%'>
+	<thead>
+		<tr>
+			<td colspan="2">
+				<h1 style='font-size: 25px; font-weight: normal; margin: 5px 0 15px;'>{% trans "Hello" %}, <b>{{ new_order.name }}</b>!</h1>
+			</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td style='border-bottom: 2px solid #eee; width: 60%; padding: 5px 5px 0; color: #444; font-size: 17px;'>{% trans "Name" %}:</td>
+			<td style='border-bottom: 2px solid #eee; width: 40%; padding: 5px 5px 0; text-align: right; color: #000; font-weight: bold;'>{{ new_order.name }}</td>
+		</tr>
+		<tr>
+			<td style='border-bottom: 2px solid #eee; width: 60%; padding: 5px 5px 0; color: #444; font-size: 17px;'>{% trans "Phone" %}:</td>
+			<td style='border-bottom: 2px solid #eee; width: 40%; padding: 5px 5px 0; text-align: right; color: #000; font-weight: bold;'>{{ new_order.phone }}</td>
+		</tr>
+		<tr>
+			<td style='border-bottom: 2px solid #eee; width: 60%; padding: 5px 5px 0; color: #444; font-size: 17px;'>{% trans "E-Mail" %}:</td>
+			<td style='border-bottom: 2px solid #eee; width: 40%; padding: 5px 5px 0; text-align: right; color: #000; font-weight: bold;'>{{ new_order.email }}</td>
+		</tr>
+		<tr>
+			<td style='border-bottom: 2px solid #eee; width: 60%; padding: 5px 5px 0; color: #444; font-size: 17px;'>{% trans "Tariff" %}:</td>
+			<td style='border-bottom: 2px solid #eee; width: 40%; padding: 5px 5px 0; text-align: right; color: #000; font-weight: bold;'>{{ new_order.tariff }}</td>
+		</tr>
+		<tr>
+			<td style='border-bottom: 2px solid #eee; width: 60%; padding: 5px 5px 0; color: #444; font-size: 17px;'>{% trans "Price" %}:</td>
+			<td style='border-bottom: 2px solid #eee; width: 40%; padding: 5px 5px 0; text-align: right; color: #000; font-weight: bold;'>{{ new_order.tariff.new_price }} {{site.config.get.get_valute_display }}</td>
+		</tr>
+
+		<tr>
+			<td colspan="2">
+				<h3 style='font-size: 20px; margin: 10px 5px 5px; font-weight: normal;'>{% trans "Additions" %}:</h3>
+			</td>
+		</tr>
+		{% for addition in new_order.additions.all %}
+		<tr>
+			<td style='border-bottom: 2px solid #eee; width: 60%; padding: 5px 5px 0; color: #444; font-size: 17px;'>{{ addition.name }}:</td>
+			<td style='border-bottom: 2px solid #eee; width: 40%; padding: 5px 5px 0; text-align: right; color: #000; font-weight: bold;'>{{ addition.price }} {{site.config.get.get_valute }}</td>
+		</tr>
+		{% endfor %}
+
+		<tr>
+			<td>&nbsp</td>
+		</tr>
+		<tr>
+			<td style='width: 60%; padding: 5px 5px 0; color: #444; margin-top: 20px; font-size: 22px;'>{% trans "Total Price" %}:</td>
+			<td style='width: 40%; padding: 5px 5px 0; text-align: right; color: #000; font-weight: bold; margin-top: 20px; font-size: 22px;'>{{ new_order.total_price }} {{site.config.get.get_valute }}</td>
+		</tr>
+	</tbody>
+</table>
+{% endblock content %}

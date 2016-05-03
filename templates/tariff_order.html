@@ -1,0 +1,127 @@
+{% load i18n %}
+<!doctype html>
+<html lang="{{ language }}">
+<head>
+	<meta charset="UTF-8">
+	<link rel='stylesheet' href='//fonts.googleapis.com/css?family=Cuprum:400,700&subset=latin,cyrillic'>
+	<link rel='stylesheet' href='/templates/express-page/css/order.css'>
+	<link rel='stylesheet' href='/static/css/button.css'>
+	<title>{% trans "Order" %}: «{{ tariff.title }}»</title>
+</head>
+
+<body>
+
+{% if ok %}
+	<h1>{% trans "Thank you!" %}</h1>
+
+	<h2>{% trans "Your request has been sent! We will contact you soon." %}</h2>
+
+	<h3>{% trans "You can also contact us:" %}</h3>
+
+	{% for office in offices %}
+		<h3 class='m-phone'>{{ office.phone }}</h3>
+		<h3 class='m-email'>{{ office.email }}</h3>
+	{% endfor %}
+
+	<a href='/' onclick='parent.$.fancybox.close();' class='b-form__submit green-sea-flat-button'>
+		{% trans "Close" %}
+	</a>
+{% else %}
+	<h1>{% trans "Order" %}: «<b>{{ tariff.title }}</b>»</h1>
+
+	<form method="post" action="">
+		{% csrf_token %}
+		{%if form.errors %}
+			<h3 class='b-form__error'>{% trans "All fields are required!" %}</h3>
+		{% endif %}
+
+		{% for field in form %}
+		{% if field.name != 'additions' %}
+			<ul class='b-field-{{ field.name }} b-field-container'>
+				<li class='{% if field.field.required %}m-field-required{% endif %} b-field-label'>
+					{{ field.label }}:
+				</li>
+				<li class='b-field-field {% if field.errors %}b-field-field__error{% endif %}'>{{ field }}</li>
+			</ul>
+		{% endif %}
+		{% endfor %}
+
+		{% for addition in additions %}
+		<div class='b-addition'>
+			<label class='b-addition__label'>
+				<input type='checkbox' name="additions" value='{{ addition.id }}' data-price='{{ addition.price }}'
+				data-from='{% if addition.price_from %}1{% else %}0{% endif %}'
+				{% if addition.id in form.additions.value %}checked{% endif %}>
+				{{ addition.name }}
+			</label>
+
+			<div class="b-addition__price">
+				{% if addition.price_from %}
+					<span class="b-price_from">{% trans "from" %}</span>
+				{% endif %}
+				<span class='b-tariff__value m-valute_{{ site.config.get.valute }}'>{{ addition.price }}</span>
+			</div>
+		</div><!-- b-addition -->
+		{% endfor %}
+
+		<div class='b-total'>
+			{% trans "Total" %}:
+			<output class='b-total__value'>
+				<span id='total_price_from'  class='b-price_from'>{% trans "from" %}</span>
+				<span id='total_price' class='b-tariff__value m-valute_{{ site.config.get.valute }}'>{{ tariff.new_price }}</span>
+			</output>
+		</div><!-- total -->
+
+		<input type='submit' value='{% trans "Order" %}' class='b-form__submit green-sea-flat-button'>
+	</form>
+
+	{% endif %}
+
+
+<script src='/templates/express-page/js/jquery-2.0.3.min.js'></script>
+
+<script>
+
+$(function() {
+
+	function calculate() {
+		var total_from = {{ tariff.price_from|lower }};
+		var total_price = {{ tariff.new_price }};
+		$('.b-addition__label input').each(function () {
+			if (this.checked) {
+				total_price += $(this).data('price');
+				console.log($(this).data('from'));
+				if ($(this).data('from')) {
+					total_from = true;
+				}
+			}
+		});
+
+		if (total_from) {
+			$('#total_price_from').show();
+		} else {
+			$('#total_price_from').hide();
+		}
+
+		$('#total_price').text(total_price);
+	}
+
+	calculate();
+
+	$('.b-addition__label input').on('change', function() {
+		calculate();
+	});
+
+	setTimeout(function() {
+		height = parent.$('.fancybox-inner').height() + 35;
+		parent.$('.fancybox-inner').height(height);
+	}, 500);
+	parent.$.fancybox.reposition();
+
+});
+
+
+</script>
+
+</body>
+</html>
